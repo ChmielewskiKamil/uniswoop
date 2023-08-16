@@ -37,6 +37,7 @@ contract ExchangeTest is Test {
         uint256 aliceTokenBalanceBefore = token.balanceOf(address(ALICE));
 
         vm.startPrank(ALICE);
+        token.approve(address(exchange), 1_000e18);
         exchange.addLiquidity(1_000e18);
         vm.stopPrank();
 

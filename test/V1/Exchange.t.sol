@@ -36,6 +36,8 @@ contract ExchangeTest is Test {
         uint256 exchangeTokenBalanceBefore = token.balanceOf(address(exchange));
         uint256 aliceTokenBalanceBefore = token.balanceOf(address(ALICE));
 
+        // Token amount is bounded to prevent wasted runs due to reverts like:
+        // "ERC20: transfer amount exceeds balance"
         _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
 
         vm.startPrank(ALICE);

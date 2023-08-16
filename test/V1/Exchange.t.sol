@@ -32,19 +32,21 @@ contract ExchangeTest is Test {
         assertEq(token.balanceOf(address(exchange)), 0);
     }
 
-    function test_NaiveAddLiquidity() public {
+    function test_NaiveAddLiquidity(uint256 _tokenAmount) public {
         uint256 exchangeTokenBalanceBefore = token.balanceOf(address(exchange));
         uint256 aliceTokenBalanceBefore = token.balanceOf(address(ALICE));
 
+        _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
+
         vm.startPrank(ALICE);
-        token.approve(address(exchange), 1_000e18);
-        exchange.addLiquidity(1_000e18);
+        token.approve(address(exchange), _tokenAmount);
+        exchange.addLiquidity(_tokenAmount);
         vm.stopPrank();
 
         uint256 exchangeTokenBalanceAfter = token.balanceOf(address(exchange));
         uint256 aliceTokenBalanceAfter = token.balanceOf(address(ALICE));
 
-        assertEq(exchangeTokenBalanceAfter, exchangeTokenBalanceBefore + 1_000e18);
-        assertEq(aliceTokenBalanceAfter, aliceTokenBalanceBefore - 1_000e18);
+        assertEq(exchangeTokenBalanceAfter, exchangeTokenBalanceBefore + _tokenAmount);
+        assertEq(aliceTokenBalanceAfter, aliceTokenBalanceBefore - _tokenAmount);
     }
 }

@@ -31,4 +31,16 @@ contract Exchange {
     function addLiquidity(uint256 _amount) public payable {
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _amount);
     }
+
+    ////////////////////////////////////////////////////////////////////
+    //                            View                                //
+    ////////////////////////////////////////////////////////////////////
+
+    /**
+     * @notice Get the amount of tokens held in the exchange contract.
+     * These tokens are available for trading.
+     */
+    function getReserves() public view returns (uint256) {
+        return IERC20(tokenAddress).balanceOf(address(this));
+    }
 }

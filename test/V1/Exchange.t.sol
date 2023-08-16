@@ -32,7 +32,7 @@ contract ExchangeTest is Test {
         assertEq(token.balanceOf(address(exchange)), 0);
     }
 
-    function test_NaiveAddLiquidity(uint256 _tokenAmount) public {
+    function test_addLiquidity_OnlyToken(uint256 _tokenAmount) public {
         uint256 exchangeTokenBalanceBefore = token.balanceOf(address(exchange));
         uint256 aliceTokenBalanceBefore = token.balanceOf(address(ALICE));
 

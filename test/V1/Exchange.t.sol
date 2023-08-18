@@ -40,10 +40,7 @@ contract ExchangeTest is Test {
         // "ERC20: transfer amount exceeds balance"
         _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
 
-        vm.startPrank(ALICE);
-        token.approve(address(exchange), _tokenAmount);
-        exchange.addLiquidity(_tokenAmount);
-        vm.stopPrank();
+        _addLiquidity(0, _tokenAmount, ALICE);
 
         uint256 exchangeTokenBalanceAfter = token.balanceOf(address(exchange));
         uint256 aliceTokenBalanceAfter = token.balanceOf(address(ALICE));
@@ -64,12 +61,9 @@ contract ExchangeTest is Test {
         // The same goes for ETH
         _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
         _ethAmount = bound(_ethAmount, 0, aliceEthBalanceBefore);
-
-        vm.startPrank(ALICE);
-        token.approve(address(exchange), _tokenAmount);
-        exchange.addLiquidity{value: _ethAmount}(_tokenAmount);
-        vm.stopPrank();
-
+        
+        _addLiquidity(_ethAmount, _tokenAmount, ALICE);
+        
         uint256 exchangeTokenBalanceAfter = token.balanceOf(address(exchange));
         uint256 exchangeEthBalanceAfter = address(exchange).balance;
 
@@ -81,5 +75,20 @@ contract ExchangeTest is Test {
 
         assertEq(exchangeEthBalanceAfter, exchangeEthBalanceBefore + _ethAmount);
         assertEq(aliceEthBalanceAfter, aliceEthBalanceBefore - _ethAmount);
+    }
+
+    function test_getEthAmount_TokenAmountNeverZero(uint256 _ethAmount, uint256 _tokenAmount) public {
+        _addLiquidity(_ethAmount, _tokenAmount, ALICE);
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //                            Helpers                             //
+    ////////////////////////////////////////////////////////////////////
+    
+    function _addLiquidity(uint256 _ethToAdd, uint256 _tokenToAdd, address _actor) private {
+        vm.startPrank(_actor);
+        token.approve(address(exchange), _tokenToAdd);
+        exchange.addLiquidity{value: _ethToAdd}(_tokenToAdd);
+        vm.stopPrank();
     }
 }

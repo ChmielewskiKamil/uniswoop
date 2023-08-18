@@ -32,15 +32,29 @@ contract Exchange {
         IERC20(tokenAddress).transferFrom(msg.sender, address(this), _amount);
     }
 
-    ////////////////////////////////////////////////////////////////////
-    //                            View                                //
-    ////////////////////////////////////////////////////////////////////
-
+    /*~*~*~*~*~*~*~*~*~*~*~*~* View Functions ~*~*~*~*~*~*~*~*~*~*~*~*~/
     /**
      * @notice Get the amount of tokens held in the exchange contract.
      * These tokens are available for trading.
      */
     function getReserves() public view returns (uint256) {
         return IERC20(tokenAddress).balanceOf(address(this));
+    }
+
+    ////////////////////////////////////////////////////////////////////
+    //                            Private                             //
+    ////////////////////////////////////////////////////////////////////
+    /**
+    * @param _inputAmount Amount of token 'x' to be exchanged for token 'y'
+    * @param _inputReserves Amount of token 'x' held in the exchange contract
+    * @param _outputReserves Amount of token 'y' held in the exchange contract
+    */
+    function _getAmount(uint256 _inputAmount, uint256 _inputReserves, uint256 _outputReserves)
+        private
+        pure
+        returns (uint256)
+    {
+        require(_inputReserves > 0 && _outputReserves > 0, "Reserves cannot be 0");
+        return (_inputAmount * _outputReserves) / _inputReserves;
     }
 }

@@ -51,4 +51,35 @@ contract ExchangeTest is Test {
         assertEq(exchangeTokenBalanceAfter, exchangeTokenBalanceBefore + _tokenAmount);
         assertEq(aliceTokenBalanceAfter, aliceTokenBalanceBefore - _tokenAmount);
     }
+
+    function test_addLiquidity_EthAndToken(uint256 _tokenAmount, uint256 _ethAmount) public {
+        uint256 exchangeTokenBalanceBefore = token.balanceOf(address(exchange));
+        uint256 exchangeEthBalanceBefore = address(exchange).balance;
+
+        uint256 aliceTokenBalanceBefore = token.balanceOf(address(ALICE));
+        uint256 aliceEthBalanceBefore = address(ALICE).balance;
+
+        // Token amount is bounded to prevent wasted runs due to reverts like:
+        // "ERC20: transfer amount exceeds balance"
+        // The same goes for ETH
+        _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
+        _ethAmount = bound(_ethAmount, 0, aliceEthBalanceBefore);
+
+        vm.startPrank(ALICE);
+        token.approve(address(exchange), _tokenAmount);
+        exchange.addLiquidity{value: _ethAmount}(_tokenAmount);
+        vm.stopPrank();
+
+        uint256 exchangeTokenBalanceAfter = token.balanceOf(address(exchange));
+        uint256 exchangeEthBalanceAfter = address(exchange).balance;
+
+        uint256 aliceEthBalanceAfter = address(ALICE).balance;
+        uint256 aliceTokenBalanceAfter = token.balanceOf(address(ALICE));
+
+        assertEq(exchangeTokenBalanceAfter, exchangeTokenBalanceBefore + _tokenAmount);
+        assertEq(aliceTokenBalanceAfter, aliceTokenBalanceBefore - _tokenAmount);
+
+        assertEq(exchangeEthBalanceAfter, exchangeEthBalanceBefore + _ethAmount);
+        assertEq(aliceEthBalanceAfter, aliceEthBalanceBefore - _ethAmount);
+    }
 }

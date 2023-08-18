@@ -61,9 +61,9 @@ contract ExchangeTest is Test {
         // The same goes for ETH
         _tokenAmount = bound(_tokenAmount, 0, aliceTokenBalanceBefore);
         _ethAmount = bound(_ethAmount, 0, aliceEthBalanceBefore);
-        
+
         _addLiquidity(_ethAmount, _tokenAmount, ALICE);
-        
+
         uint256 exchangeTokenBalanceAfter = token.balanceOf(address(exchange));
         uint256 exchangeEthBalanceAfter = address(exchange).balance;
 
@@ -77,14 +77,23 @@ contract ExchangeTest is Test {
         assertEq(aliceEthBalanceAfter, aliceEthBalanceBefore - _ethAmount);
     }
 
-    function test_getEthAmount_TokenAmountNeverZero(uint256 _ethAmount, uint256 _tokenAmount) public {
-        _addLiquidity(_ethAmount, _tokenAmount, ALICE);
+    function test_getEthAmount_twoTimesMoreTokensThanEth() public {
+        uint256 _ethInputAmount = 1e18;
+        uint256 _tokenInputAmount = 2e18;
+
+        deal(ALICE, _ethInputAmount);
+
+        _addLiquidity(_ethInputAmount, _tokenInputAmount, ALICE);
+
+        uint256 ethAmount = exchange.getEthAmount({_tokenInputAmount: 1e18});
+
+        assertEq(ethAmount, 0.5e18);
     }
 
     ////////////////////////////////////////////////////////////////////
     //                            Helpers                             //
     ////////////////////////////////////////////////////////////////////
-    
+
     function _addLiquidity(uint256 _ethToAdd, uint256 _tokenToAdd, address _actor) private {
         vm.startPrank(_actor);
         token.approve(address(exchange), _tokenToAdd);
